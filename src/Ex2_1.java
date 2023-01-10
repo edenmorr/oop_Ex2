@@ -1,13 +1,11 @@
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Random;
 import java.io.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.FilterOutputStream;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 
 public class Ex2_1 {
@@ -26,27 +24,37 @@ public class Ex2_1 {
         String[] fileNames = new String[n];
         Random rand = new Random(seed);
         for (int i = 0; i < n; i++) {
-            String fileName = "file_" + (i + 1);
+            String fileName = "file_" + (i + 1) + ".txt";
             fileNames[i] = fileName;
-            File file_ = new File(fileName);
-            boolean b = file_.mkdir();
+            int lineNumber = rand.nextInt(bound) + 1;
+            File file = new File(fileName);
+            int fileIndex=1;
+            while(file.exists()){
+                file = new File(fileName+"_"+fileIndex);
+                fileIndex++;
+            }
             try {
-                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file_));
-//                FileWriter fWrite = new FileWriter(file_);// i change to BufferedWriter just in case that the text will be long
-                int lineNumber = rand.nextInt(bound) + 1;
+                FileOutputStream fw = new FileOutputStream(file);
                 for (int j = 0; j < lineNumber; j++) {
-                    while (file_.exists()) {
-                        bufferedWriter.write("hellow world\n");
-                    }
+                    //System.lineSeparator() is insert a new line in a text file
+                    String line = "hellow world" + System.lineSeparator();
+                        fw.write(line.getBytes());
                 }
-                bufferedWriter.close();
+                fw.close();
             } catch (IOException e) {
                 System.out.println("Error creating file: " + fileName);
             }
         }
         return fileNames;
     }
-
+        public static void deleteFile(String fileNames) {
+            File file = new File(fileNames);
+            if (file.delete()) {
+                System.out.println(file.getName() + " has been deleted.");
+            } else {
+                System.out.println("Failed to delete " + file.getName());
+            }
+        }
     /**
      * @param fileNames array that contains file names
      * @return the total number of lines of the files
@@ -104,31 +112,30 @@ public class Ex2_1 {
         int lines = 0;
         //creats an arry that heritat from lineconter thread class
         LineCounterThread[] threads = new LineCounterThread[fileNames.length];
-        for (int i = 0; i < fileNames.length; i++) {
-            //creating a new program for every file
-            threads[i] = new LineCounterThread(fileNames[i]);
-            // starting the program
-            threads[i].start();
-        }
-        //waiting for al of the programs to be done by the function join
-        for (int i = 0; i < threads.length; i++) {
-            try {
-                threads[i].join();
-            } catch (InterruptedException e) {
+        try {
+            for (int i = 0; i < fileNames.length; i++) {
+                //creating a new program for every file
+                threads[i] = new LineCounterThread(fileNames[i]);
+                // starting the program
+                threads[i].start();
+            }
+            //waiting for al of the programs to be done by the function join
+            for (int i = 0; i < threads.length; i++) {
+                if (!threads[i].isAlive()) {//לנסות משהו אחר
+                    lines += threads[i].getCountLines();
+                } else {
+                    threads[i].join();
+                    lines += threads[i].getCountLines();
+                }
+            }
+            } catch(InterruptedException e){
                 e.printStackTrace();
             }
-            // the total amount of the lines of all of the files
-            lines += threads[i].getCountLines();
-        }
         return lines;
     }
 
-    /**
-     * @param fileNames array that contains file names
-     * @return the total number of lines of the files
-     * //
-     */
-    public class LineCounterThreadpool implements Callable {
+
+    public static class LineCounterThreadpool implements Callable<Integer> {
         private String fileName;
         private int countLines;
         public LineCounterThreadpool(String fileName){
@@ -136,7 +143,7 @@ public class Ex2_1 {
             this.countLines=0;
         }
         @Override
-        public Object call() throws Exception {
+        public Integer call() throws Exception {
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(fileName));
                 while (reader.readLine() != null) {
@@ -151,34 +158,41 @@ public class Ex2_1 {
             return countLines;
         }
     }
-    public int getNumOfLinesThreadPool(String[] fileNames) {
-        ExecutorService ex = Executors.newFixedThreadPool(fileNames.length);
-        for (int i = 0; i < fileNames.length; i++) {
-            //creating a new program for every file
-//            ex.submit(new LineCounterThreadpool(i))=
-            // starting the program
-            ex.submit(new LineCounterThreadpool("file_"+i+1));
-
+    /**
+     * @param fileNames array that contains file names
+     * @return the total number of lines of the files
+     * //
+     */
+    public static int getNumOfLinesThreadPool(String[] fileNames) {
+        int n = fileNames.length;
+        int result=0;
+        ExecutorService ex = Executors.newFixedThreadPool(n);
+        Future<Integer> thread[] = new Future[n];
+        //creating a new program for every file
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < n; i++) {
+            LineCounterThreadpool threadpool = new LineCounterThreadpool(fileNames[i]);
+            thread[i] = ex.submit(threadpool);
+           // System.out.println("Thread " + i + " returned value: " + results[i - 1].get());
         }
-        //waiting for al of the programs to be done by the function join
-        for (int i = 0; i < threads.length; i++) {
+        for (int i = 0; i < n; i++) {
             try {
-                threads[i].join();
-            } catch (InterruptedException e) {
+                result += thread[i].get();
+            } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
-            // the total amount of the lines of all of the files
-            lines += threads[i].getCountLines();
         }
-        return lines;
-    }        return 0;
+        long end = System.currentTimeMillis();
+        System.out.println("time = " + (end - start) + " ms");
+        ex.shutdown();
+        return result;
     }
 
     public static void main(String[] args) {
-        int n = 9, seed = 1, bound = 100;
-        File f = new File("file_" + n);
-        createTextFiles(n, seed, bound);
-        String[] fileNames = {"file1.txt", "file2.txt", "file3.txt"};
+        int n = 2, seed = 1, bound = 10;
+        // File f = new File("file_" + n);
+        String[] fileNames = createTextFiles(n, seed, bound);
+        getNumOfLinesThreadPool(fileNames);
     }
 }
 
