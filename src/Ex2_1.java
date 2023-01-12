@@ -61,6 +61,7 @@ public class Ex2_1 {
      */
     public static int getNumOfLines(String[] fileNames) {
         int countLines = 0;
+        long start = System.currentTimeMillis();
         for (String fileName : fileNames) {
             File myfile = new File(fileName);
             try {
@@ -73,6 +74,8 @@ public class Ex2_1 {
                 System.out.println("Error reading file: " + fileName);
             }
         }
+        long end = System.currentTimeMillis();
+        System.out.println("time = " + (end - start) + " ms");
         return countLines;
     }
 
@@ -112,6 +115,7 @@ public class Ex2_1 {
         int lines = 0;
         //creats an arry that heritat from lineconter thread class
         LineCounterThread[] threads = new LineCounterThread[fileNames.length];
+        long start = System.currentTimeMillis();
         try {
             for (int i = 0; i < fileNames.length; i++) {
                 //creating a new program for every file
@@ -131,6 +135,8 @@ public class Ex2_1 {
             } catch(InterruptedException e){
                 e.printStackTrace();
             }
+        long end = System.currentTimeMillis();
+        System.out.println("time = " + (end - start) + " ms");
         return lines;
     }
 
