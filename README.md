@@ -36,7 +36,7 @@ pool size, after changing the pool size to the number of cores we get:
 
 (more indepth explenations inside the test part1TestReadTimes)
 
-we use 3 helper classes to make the code cleaner:
+we use 3tper classes to make the code cleaner:
 1. LineCounterCallable
 2. LineCounterThread
 3. LineCoutner
@@ -48,3 +48,34 @@ writeLinesToFile(..)
 
 and 1 helper function for storage managing:
 deleteFiles(..) - deletes all txt files we created
+
+
+### Part 2:
+we create two classes: Task, CustomExecutor
+
+####Task:
+we create a new object that on one hand works like callable in the sense that 
+it returns a value on call, and on the other hand works like a FutureTask (runnable)
+in order to use it to get() calculated data. in out implementation we wrote it
+as a runnable FutureTask<T> and created a Callable to store method that will be
+executed
+
+the Task uses generics in order to be able to work will all diffrent kinds of
+outputs and calculations
+
+it also implements Comparable<Task<?>> in order for each task to be compared to
+every other tasks priority regardless of Task type, this will be used to sort it
+be its priority
+
+####CustomExecutor:
+we create a new object that will act as a thread pool, it will be capalbe of handeling
+subbmitions of:
+1. Callable - uses default priority
+2. Callable & TaskType - to set priority
+3. Task - data already set
+
+and will return a Task<T> object on each submttion in order to access the final result
+
+the pool will automatically sort the subbmitions based on their priority
+
+(in the test file there is an in depth explenation + test of the workings of out thread pool)
