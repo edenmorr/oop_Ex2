@@ -56,9 +56,9 @@ we create two classes: Task, CustomExecutor
 #### Task:
 we create a new object that on one hand works like callable in the sense that 
 it returns a value on call, and on the other hand works like a FutureTask (runnable)
-in order to use it to get() calculated data. in out implementation we wrote it
-as a runnable FutureTask<T> and created a Callable to store method that will be
-executed
+in order to use it to get() calculated data. in our implementation we extend from
+FutureTask<T> and implement callable<T> , we also created a Callable to store method 
+that will be executed
 
 the Task uses generics in order to be able to work will all diffrent kinds of
 outputs and calculations
