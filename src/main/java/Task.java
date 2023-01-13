@@ -3,7 +3,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-public class Task<T> extends FutureTask<T> implements Comparable<Task<?>>, Callable<T> {
+public class Task<T> extends FutureTask<T> implements Comparable<Task<?>>, Callable<T>{
     private TaskType taskType;
     private Callable<T> callable;
 
@@ -52,8 +52,8 @@ public class Task<T> extends FutureTask<T> implements Comparable<Task<?>>, Calla
     }
 
     /**
-     * call the assignend callable and return its value
-     * @return post operation value
+     * calls the assigned callable and returns its value
+     * @return the result of the callable computation
      */
     @Override
     public T call() throws Exception {
@@ -66,12 +66,6 @@ public class Task<T> extends FutureTask<T> implements Comparable<Task<?>>, Calla
     @Override
     public void run() {
         super.run();
-    }
-    
-    @Override
-    public T get() throws InterruptedException, ExecutionException {
-        // TODO Auto-generated method stub
-        return super.get();
     }
 
     /**
