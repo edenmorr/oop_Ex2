@@ -106,9 +106,9 @@ public class Tests {
         /*
          * results may very, espesically with thread array
          * [usually:
-         * 1 thread : ~29ms
-         * thread array : ~6ms
-         * thread pool : ~8ms
+         * 1 thread : ~26ms
+         * thread array : ~8ms
+         * thread pool : ~16ms
          * ]
          * some runs as expected - the thread pool was fater then the thread array
          * but most times thread array was aster then thread pool, this is because
@@ -213,6 +213,9 @@ public class Tests {
         // we expect the tasks to change their order in the queue and
         // execute in the correct assigned priority, should be 
         // ret3 -> ret2 -> ret1
+
+        final int maxprio = ce.getCurrentMax(); //should be 1 because of ret3 [COMPUTATIONAL]
+        logger.info(() -> "max priority : " + maxprio);
 
         try { //let all tasks lime to finish
             Thread.sleep(500);
