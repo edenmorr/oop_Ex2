@@ -81,5 +81,5 @@ the pool will automatically sort the subbmitions based on their priority
 (in the test file there is an in depth explenation + test of the workings of out thread pool)
 
 
-### UML file as image : 
+### UML file as image : (Diagram.uml)
 ![Diagram](https://user-images.githubusercontent.com/118988238/212318634-479cbf2a-1c89-4dc9-adb2-525587d53e79.png)
