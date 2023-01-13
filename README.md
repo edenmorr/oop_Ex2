@@ -53,7 +53,7 @@ deleteFiles(..) - deletes all txt files we created
 ### Part 2:
 we create two classes: Task, CustomExecutor
 
-####Task:
+#### Task:
 we create a new object that on one hand works like callable in the sense that 
 it returns a value on call, and on the other hand works like a FutureTask (runnable)
 in order to use it to get() calculated data. in out implementation we wrote it
@@ -67,7 +67,7 @@ it also implements Comparable<Task<?>> in order for each task to be compared to
 every other tasks priority regardless of Task type, this will be used to sort it
 be its priority
 
-####CustomExecutor:
+#### CustomExecutor:
 we create a new object that will act as a thread pool, it will be capalbe of handeling
 subbmitions of:
 1. Callable - uses default priority
