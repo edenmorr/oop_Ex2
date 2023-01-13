@@ -55,8 +55,14 @@ public class Task<T> extends FutureTask<T> implements Comparable<Task<?>>, Calla
      * calls the assigned callable and returns its value
      * @return the result of the callable computation
      */
-    @Override
+      @Override
     public T call() throws Exception {
+        try {
+            callable.call();
+        } catch (Exception e) {
+            System.out.println("Error" +e);
+            return null;
+        }
         return callable.call();
     }
 
